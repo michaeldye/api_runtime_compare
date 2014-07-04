@@ -1,3 +1,30 @@
+# api_runtime_compare
+
+## Introduction
+
+This project is intended to collect API runtime samples for comparison. It's aimed at investigating runtimes and libs that support HTTP-based APIs. The common API implemented in each runtime is a simple sequence generator (cf. <raml URL>). Each runtime should return a 400-level HTTP response code if it fails to implement a path in the spec. Each runtime binds to port `9009` and all tests are to be executed in-container. Only test results with no reported socket errors are allowed.
+
+## Test Results
+
+### Platforms
+
+**heidegger**: 3.15.3-1-ARCH x86_64 GNU/Linux; Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz; 16GB RAM
+
+### Runtime Performance Results
+
+##### java7_netty on heidegger, 2014-07-04 (4GB heap)
+
+As usual, I ran the tests in the same container as the running service for maximum convenience.
+
+        Running 5m test @ http://localhost:9009/api/count/35
+          3 threads and 500 connections
+            Thread Stats   Avg      Stdev     Max   +/- Stdev
+            Latency     1.98ms   10.24ms 216.36ms   98.19%
+            Req/Sec   117.41k    42.41k  256.89k    62.62%
+          97615945 requests in 5.00m, 15.91GB read
+        Requests/sec: 325386.44
+        Transfer/sec:     54.30MB
+
 ## Cautions
 
   **WARNING**: The docker container in this project contains a fantastic backdoor that allows unauthenticated root access to the container's filesystem via [rsyncd_backdoor_setup.bash](https://bitbucket.org/mdye/docker-container_setup/src/88fd82643996d0b711c524988f2a04a4c9273b48/centos/rsyncd_backdoor_setup.bash?at=master). This backdoor is used in this guide to customize SSH keys in-container. By default, the rsync daemon that creates this vulnerability is running but in order for it to be used the port `873` must be mapped out of the container with something like the Docker command `run`'s `-p` argument. If you don't map the port to the host system the backdoor can't be used outside of the system. If this mode still leaves you uncomfortable, remove the file `/etc/rsyncd.conf` and edit `/etc/supervisord.conf` in-container, commit it, and use your modified version.
@@ -73,15 +100,25 @@ You can now start your customized container with the tag `mykey` using the comma
 
 ### Project use
 
+#### One-time host system setup
+
+Raise hard and soft file limits. In stock Arch linux, this'll do:
+
+    sudo echo -e "\n*   hard  nofile    30000\n*   soft  nofile    30000" >> /etc/security/limits.conf
+
+... and then reboot. You can check the limits on your box with `ulimit -Hn` and `ulimit -n`.
+
 #### New container setup
 
-Once inside container container, and in directory `/work`, execute:
+Once inside container, start a runtime:
 
-    npm install
+    /work/java7_netty/start.sh
 
-#### Common in-container project commands
+... and then start a test:
 
-(TODO: expand)
+    /work/tests/test_count.sh
+
+Note that JVM runtimes perform best after runtime optimization. To get the best results, run a test multiple times against the same runtime before recording them.
 
 ### Misc. docker commands
 

@@ -1,0 +1,9 @@
+*~
+*.sw*
+eclipse-build
+.classpath
+.gradle
+.settings
+.project
+.cache
+build/

@@ -1,0 +1,49 @@
+apply plugin: 'eclipse'
+
+/************************
+eclipse conveniences
+************************/
+eclipse.classpath.downloadSources = true
+eclipse.classpath.downloadJavadoc = true
+
+eclipse.classpath.defaultOutputDir = file('eclipse-build')
+
+// the following works only for java 1.6 and newer b/c the string has changed
+if (targetCompatibility >= JavaVersion.toVersion(1.6)) {
+  eclipse.classpath.containers.clear()
+  eclipse.classpath.containers.add('org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-' + targetCompatibility)
+}
+
+import org.gradle.plugins.ide.eclipse.model.SourceFolder
+def toExclude = ['.git', project.buildDir.name]
+
+childProjects.entrySet().each { entry ->
+  String projectDirName = entry.getValue().projectDir.name
+  toExclude += projectDirName
+}
+
+eclipse.project.file.withXml { projectXml ->
+  Node root = projectXml.asNode()
+  toExclude.each { folderName ->
+    if (new File(projectDir, folderName).exists()) {
+      addDirToFilteredResources(folderName, root)
+      logger.info "Excluding dir $folderName from eclipse project (${project.name})"
+    }
+  }
+}
+
+def addDirToFilteredResources(String dirName, Node root)
+{
+  def filteredResources = root.depthFirst().find { it.name() == 'filteredResources' }
+  if (!filteredResources) {
+    filteredResources = root.appendNode('filteredResources')
+  }
+
+  Node filter = new Node(filteredResources, 'filter')
+  filter.appendNode('id').value = System.currentTimeMillis()
+  filter.appendNode('name')
+  filter.appendNode('type').value = '30'
+  Node matcher = new Node(filter, 'matcher')
+  matcher.appendNode('id').value = 'org.eclipse.ui.ide.multiFilter'
+  matcher.appendNode('arguments').value = "1.0-name-matches-false-false-${dirName}"
+}

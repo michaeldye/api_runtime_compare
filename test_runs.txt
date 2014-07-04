@@ -1,0 +1,12 @@
+heidegger: 3.15.3-1-ARCH x86_64 GNU/Linux; Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz; 16GB RAM
+===============
+
+mdye@heidegger:tests[10215]# ./test_count.sh
+Running 40s test @ http://localhost:9009/api/count/50
+  3 threads and 600 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     2.14ms    5.10ms 812.80ms   93.95%
+    Req/Sec    85.11k    29.50k  174.87k    66.98%
+  9814828 requests in 40.00s, 2.02GB read
+Requests/sec: 245367.58
+Transfer/sec:     51.71MB

@@ -1,0 +1,46 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+  }
+}
+
+
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'gradle-one-jar'
+
+  repositories {
+    mavenCentral()
+  }
+
+  project.version = '0.1.0-SNAPSHOT'
+  project.group = 'com.lulzotron.perf'
+
+  targetCompatibility = 1.8
+  sourceCompatibility = 1.8
+
+  apply from: "${rootProject.projectDir}/eclipse.gradle"
+
+  dependencies {
+    compile 'ch.qos.logback:logback-classic:1.0.13'
+  }
+}
+
+project(':common') {
+}
+
+project(':netty') {
+
+  dependencies {
+    compile 'io.netty:netty-all:4.0.21.Final'
+    compile project(':common')
+  }
+
+
+  task oneJar(type: OneJar) {
+    mainClass = 'com.lulzotron.perf.netty.Serve'
+  }
+}

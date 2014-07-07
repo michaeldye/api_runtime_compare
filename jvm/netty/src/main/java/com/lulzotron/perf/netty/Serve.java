@@ -1,4 +1,4 @@
-package com.lulzotron.perf.java7netty;
+package com.lulzotron.perf.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

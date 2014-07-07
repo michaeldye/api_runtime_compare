@@ -112,11 +112,11 @@ Raise hard and soft file limits. In stock Arch linux, this'll do:
 
 Once inside container, start a runtime:
 
-    /work/java7_netty/start.sh
+    /work/java7_netty/start.bash
 
 ... and then start a test:
 
-    /work/tests/test_count.sh
+    /work/tests/test_count.bash
 
 Note that JVM runtimes perform best after runtime optimization. To get the best results, run a test multiple times against the same runtime before recording them.
 

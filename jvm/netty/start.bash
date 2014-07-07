@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 (cd ${BASH_SOURCE%/*}; gradle clean oneJar && java -jar $( ls $(pwd)/build/libs/*standalone.jar ) \
 -XX:+UseG1GC \

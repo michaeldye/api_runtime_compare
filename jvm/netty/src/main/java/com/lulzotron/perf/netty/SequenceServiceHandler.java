@@ -1,8 +1,9 @@
-package com.lulzotron.perf.java7netty;
+package com.lulzotron.perf.netty;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import io.netty.buffer.Unpooled;
@@ -24,6 +25,8 @@ import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lulzotron.perf.seq.SequenceGenerator;
+
 /**
  * <p>
  * A handler for a Netty 4 implementation of the Sequence API (cf. <raml spec>
@@ -41,13 +44,18 @@ import org.slf4j.LoggerFactory;
  */
 public class SequenceServiceHandler extends ChannelInboundHandlerAdapter {
 
-  static final Logger LOG = LoggerFactory
-      .getLogger(SequenceServiceHandler.class);
+  static final Logger LOG = LoggerFactory.getLogger(SequenceServiceHandler.class);
 
   private static final HttpVersion SUPPORTED_HTTP_VER = HttpVersion.HTTP_1_1;
 
   private HttpRequest request;
 
+  private final SequenceGenerator gen;
+
+  public SequenceServiceHandler(final SequenceGenerator gen) {
+    this.gen = gen;
+  }
+  
   /*
    * (non-Javadoc)
    * 
@@ -56,7 +64,7 @@ public class SequenceServiceHandler extends ChannelInboundHandlerAdapter {
    * .ChannelHandlerContext, java.lang.Object)
    */
   @Override
-  public void channelRead(ChannelHandlerContext context, Object message)
+  public void channelRead(final ChannelHandlerContext context, final Object message)
       throws URISyntaxException {
 
     // only care about query params so far, no need to inspect req content using
@@ -84,7 +92,7 @@ public class SequenceServiceHandler extends ChannelInboundHandlerAdapter {
    * .channel.ChannelHandlerContext)
    */
   @Override
-  public void channelReadComplete(ChannelHandlerContext context) {
+  public void channelReadComplete(final ChannelHandlerContext context) {
     // expensive operation, only do when passing req out of this handler
     context.flush();
   }
@@ -97,9 +105,9 @@ public class SequenceServiceHandler extends ChannelInboundHandlerAdapter {
    * channel.ChannelHandlerContext, java.lang.Throwable)
    */
   @Override
-  public void exceptionCaught(ChannelHandlerContext context, Throwable cause) {
+  public void exceptionCaught(final ChannelHandlerContext context, final Throwable cause) {
     if (cause instanceof IOException) {
-      LOG.error("IO interrupted, cf. debug log");
+      LOG.warn("IO interrupted, cf. debug log");
       LOG.debug("IO error", cause);
     } else {
       LOG.error("Unexpected error encountered", cause);
@@ -110,20 +118,32 @@ public class SequenceServiceHandler extends ChannelInboundHandlerAdapter {
   /*
    * Route requests by path, delegate to a content generator
    */
-  private HttpResponse route(ChannelHandlerContext context, HttpRequest request)
+  private HttpResponse route(final ChannelHandlerContext context, final HttpRequest request)
       throws URISyntaxException {
     String[] pathBits = new URI(request.getUri()).getPath().split("/");
 
     if (pathBits.length >= 4 && "api".equals(pathBits[1])) {
-      switch (pathBits[2]) {
-      case "count":
-        try {
-          return response(OK, doCount(pathBits[3]));
-        } catch (Exception ex) {
-          return response(BAD_REQUEST);
+      int param;
+      try {
+        param = Integer.parseInt(pathBits[3]);
+      } catch (NumberFormatException ex) {
+        return response(BAD_REQUEST);
+      }
+
+      try {
+        switch (pathBits[2]) {
+        case "count":
+          return response(OK, gen.count(param, SequenceGenerator.plain));
+        case "fib":
+          return response(OK, gen.fib(param, SequenceGenerator.plain));
+        default:
+          // let it fall through to NOT_FOUND
         }
-      default:
-        // let it fall through to 404
+        
+      } catch (Exception ex) {
+        LOG.error("Error computing response content for req {}",
+            request.getUri(), ex);
+        return response(INTERNAL_SERVER_ERROR);
       }
     }
 
@@ -131,34 +151,14 @@ public class SequenceServiceHandler extends ChannelInboundHandlerAdapter {
   }
 
   /*
-   * Generate content for /count path
-   */
-  private String doCount(String param) {
-    StringBuffer sb = new StringBuffer();
-
-    // the slow and easy way
-    int upTo = Integer.parseInt(param);
-    for (int ix = 1; ix <= upTo; ix++) {
-      sb.append(ix);
-
-      if (ix < upTo) {
-        sb.append(' ');
-      }
-    }
-
-    return sb.toString();
-  }
-
-  /*
    * Generate response with optional content; handles response headers, writes
    * content
    */
-  private HttpResponse response(HttpResponseStatus status, String content) {
+  private HttpResponse response(final HttpResponseStatus status, final String content) {
     FullHttpResponse response;
     if (content != null) {
       response = new DefaultFullHttpResponse(SUPPORTED_HTTP_VER, status,
-          Unpooled.unmodifiableBuffer(Unpooled.directBuffer().writeBytes(
-              content.getBytes())), false);
+          Unpooled.directBuffer().writeBytes(content.getBytes()), false);
       response.headers().set(CONTENT_TYPE, "text/plain; charset=UTF-8");
 
       if (HttpHeaders.isKeepAlive(request)) {
@@ -176,7 +176,7 @@ public class SequenceServiceHandler extends ChannelInboundHandlerAdapter {
   /*
    * Convenience method for content-less responses
    */
-  private HttpResponse response(HttpResponseStatus status) {
+  private HttpResponse response(final HttpResponseStatus status) {
     return response(status, null);
   }
 }

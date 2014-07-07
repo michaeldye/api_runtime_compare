@@ -1,4 +1,4 @@
-FROM aslag/centos6_jdk7_51:vanilla
+FROM aslag/centos6_jdk8_5:vanilla
 MAINTAINER mdye <michael.dye@sungard.com>
 
 # see https://bugs.centos.org/view.php?id=7126

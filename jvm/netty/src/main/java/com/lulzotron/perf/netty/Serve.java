@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory;
  * Entrypoint for a Netty 4 implementation of the Sequence API (cf. <raml spec>
  * ).
  * </p>
- * 
+ *
  * <p>
  * Server listens on port 9004.
  * </p>
- * 
+ *
  * @author mdye
  *
  */
@@ -28,7 +28,7 @@ public class Serve {
   private final int port;
 
   Serve(final int port) {
-    LOG.info("java7_netty server configured with port {}", port);
+    LOG.info("netty server configured with port {}", port);
     this.port = port;
   }
 
@@ -60,7 +60,7 @@ public class Serve {
     }
   }
 
-  public static void main(String... args) {
+  public static void main(final String... args) {
     int port = 9009; // TODO: make configurable if desirable
 
     try {

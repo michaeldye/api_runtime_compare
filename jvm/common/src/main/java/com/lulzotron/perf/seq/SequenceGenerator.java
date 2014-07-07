@@ -11,13 +11,9 @@ import java.util.function.Function;
 
 /**
  * <p>
- * A really simplistic lazy sequence generator.
- * </p>
- * 
- * <p>
- * TODO: If performance becomes a problem, first consider extending a sequence
- * with multiple worker threads. Failing that, use the macho <a
- * href=https://code.google.com/p/totallylazy/">TotallyLazy lib</a> instead.
+ * A really simplistic lazy sequence generator. The memoization scheme uses
+ * {@link BigInteger} which slows it down quite a bit. Consider a more
+ * performant representation if necessary.
  * </p>
  * 
  * @author mdye
@@ -38,27 +34,38 @@ public class SequenceGenerator {
     sequences = Collections.unmodifiableMap(modSequences);
   }
 
-  public String count(final int upTo, SequenceFormatter formatter) {
+  /**
+   * <p>
+   * Counts from 1 up to given integer <code>upTo</code>.
+   * </p>
+   * 
+   * @param upTo
+   * @param formatter
+   * @return formatted result String
+   */
+  public String count(final int upTo, final SequenceFormatter formatter) {
     // no benefit to memoizing this one
-    return formatter.format(upTo, (Integer ix) -> ix + 1);
+    return formatter.format(upTo - 1, (Integer ix) -> ix + 1);
   }
 
   /**
    * <p>
-   * Calculates fibonacci sequence up to given <code>upTo</code> num. Throws
-   * {@link IllegalArgumentException} when upTo is too large.
+   * Calculates fibonacci sequence up to number in sequence identified by
+   * <code>n</code>.
    * </p>
    * 
-   * 
-   * @param upTo
+   * @param n
    * @param writer
    * @return formatted result String
    * @throws IllegalArgumentException
    */
-  public String fib(final int upTo, SequenceFormatter formatter)
+  public String fib(final int n, final SequenceFormatter formatter)
       throws IllegalArgumentException {
-    return formatter.format(upTo,
-        memoCalc((Integer ix) -> calcFib(BigInteger.valueOf(ix), BigInteger.ONE, BigInteger.ZERO), Sequences.FIB));
+    return formatter.format(
+        n,
+        memoCalc(
+            (final Integer ix) -> calcFib(BigInteger.valueOf(ix),
+                BigInteger.ONE, BigInteger.ZERO), Sequences.FIB));
   }
 
   /*
@@ -69,8 +76,8 @@ public class SequenceGenerator {
 
     final StringBuffer sb = new StringBuffer();
 
-    for (int ix = 1; ix <= value; ix++) {
-      sb.append(wrapper.apply(ix - 1));
+    for (int ix = 0; ix <= value; ix++) {
+      sb.append(wrapper.apply(ix));
 
       if (ix < value) {
         sb.append(' ');
@@ -81,9 +88,10 @@ public class SequenceGenerator {
   };
 
   /*
-   * A tail-rec fib method calculation method
+   * A tail-rec fib calculation method
    */
-  private BigInteger calcFib(BigInteger n, BigInteger next, BigInteger result) {
+  private BigInteger calcFib(final BigInteger n, final BigInteger next,
+      final BigInteger result) {
     if (n.equals(BigInteger.ZERO))
       return result;
     else
@@ -97,7 +105,7 @@ public class SequenceGenerator {
   private Function<Integer, BigInteger> memoCalc(
       final Function<Integer, BigInteger> calc, final Sequences sequence) {
 
-    return (Integer index) -> {
+    return (final Integer index) -> {
       List<BigInteger> seq = sequences.get(sequence);
 
       BigInteger val;

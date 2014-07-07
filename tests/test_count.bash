@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 URI_BASE='http://localhost:9009/api/count'
-WRK_CMD="wrk -t4 -c450 -d600s $URI_BASE/35"
+WRK_CMD="wrk -t3 -c500 -d300s $URI_BASE/35"
 
 exit_error()
 {

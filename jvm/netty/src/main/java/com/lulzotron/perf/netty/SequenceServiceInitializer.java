@@ -18,7 +18,7 @@ public class SequenceServiceInitializer extends
   private static final SequenceGenerator gen = new SequenceGenerator();
 
   @Override
-  protected void initChannel(SocketChannel channel)
+  protected void initChannel(final SocketChannel channel)
   {
     ChannelPipeline pipeline = channel.pipeline();
     pipeline.addLast("codec", new HttpServerCodec());

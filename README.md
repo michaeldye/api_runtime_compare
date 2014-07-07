@@ -112,7 +112,7 @@ Raise hard and soft file limits. In stock Arch linux, this'll do:
 
 Once inside container, start a runtime:
 
-    /work/java7_netty/start.bash
+    /work/netty/start.bash
 
 ... and then start a test:
 

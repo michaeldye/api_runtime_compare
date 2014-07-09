@@ -34,7 +34,7 @@ eclipse.project.file.withXml { projectXml ->
 
 def addDirToFilteredResources(String dirName, Node root)
 {
-  def filteredResources = root.depthFirst().find { it.name() == 'filteredResources' }
+  def filteredResources = root.depthFirst().find { it == 'filteredResources' }
   if (!filteredResources) {
     filteredResources = root.appendNode('filteredResources')
   }

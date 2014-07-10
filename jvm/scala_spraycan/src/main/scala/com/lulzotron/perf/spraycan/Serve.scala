@@ -9,22 +9,24 @@ import spray.routing.SimpleRoutingApp
 import com.lulzotron.perf.seq.SequenceGenerator
 
 object Serve extends App with SimpleRoutingApp {
-  val gen = new SequenceGenerator()
   implicit val system = ActorSystem("seq")
+
+  lazy val fibs: Stream[BigInt] = BigInt(0) #:: BigInt(1) #:: fibs.zip(fibs.tail).map { n => n._1 + n._2 }
+  def plain(s: Seq[Any]): String = { s.mkString(" ") }
 
   startServer(interface = "localhost", port = 9009) {
     pathPrefix("api") {
       pathPrefix("count" / IntNumber) { upTo =>
         get {
           complete {
-            gen.count(upTo, SequenceGenerator.plain)
+            plain(1 until upTo + 1)
           }
         }
       } ~
       pathPrefix("fib" / IntNumber) { n =>
         get {
           complete {
-            gen.fib(n, SequenceGenerator.plain)
+            plain(fibs take n + 1)
           }
         }
       }

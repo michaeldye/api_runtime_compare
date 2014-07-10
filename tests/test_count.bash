@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: consolidate with other scripts
+
 URI_BASE='http://localhost:9009/api/count'
 WRK_CMD="wrk -t3 -c500 -d300s $URI_BASE/35"
 

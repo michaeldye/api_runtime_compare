@@ -12,18 +12,36 @@ This project is intended to collect API runtime samples for comparison. It's aim
 
 ### Runtime Performance Results
 
-##### java7_netty on heidegger, 2014-07-04 (4GB heap)
+##### netty on heidegger, 2014-07-09 (4GB heap)
 
-As usual, I ran the tests in the same container as the running service for maximum convenience.
+As usual, I ran the tests on the same system as the running service for maximum convenience.
 
+        mdye@heidegger: java -version
+        java version "1.8.0_05"
+        ...
+        mdye@heidegger:tests[10066]# ./test_count.bash
+        Testing http://localhost:9009/api/count for correctness...
+        Testing complete, starting benchmark
         Running 5m test @ http://localhost:9009/api/count/35
           3 threads and 500 connections
-            Thread Stats   Avg      Stdev     Max   +/- Stdev
-            Latency     1.98ms   10.24ms 216.36ms   98.19%
-            Req/Sec   117.41k    42.41k  256.89k    62.62%
-          97615945 requests in 5.00m, 15.91GB read
-        Requests/sec: 325386.44
-        Transfer/sec:     54.30MB
+          Thread Stats   Avg      Stdev     Max   +/- Stdev
+            Latency     6.25ms   31.05ms 242.23ms   97.84%
+            Req/Sec   120.67k    54.68k  232.89k    65.46%
+          98720311 requests in 5.00m, 16.09GB read
+        Requests/sec: 329066.91
+        Transfer/sec:     54.92MB
+
+        mdye@heidegger:tests[10118]# ./test_fib.bash
+        Testing http://localhost:9009/api/fib for correctness...
+        Testing complete, starting benchmark
+        Running 5m test @ http://localhost:9009/api/fib/
+          2 threads and 400 connections
+          Thread Stats   Avg      Stdev     Max   +/- Stdev
+            Latency     2.54ms    5.40ms 141.97ms   91.57%
+            Req/Sec    81.18k    11.24k  139.44k    73.79%
+          45832291 requests in 5.00m, 21.32GB read
+        Requests/sec: 152774.34
+        Transfer/sec:     72.77MB
 
 ## Cautions
 

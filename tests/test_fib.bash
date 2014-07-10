@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
+# TODO: consolidate with other scripts
+
 URI_BASE='http://localhost:9009/api/fib'
-WRK_CMD="wrk -t2 -c400 -d600s -s ${BASH_SOURCE%/*}/fibs.lua $URI_BASE/"
+WRK_CMD="wrk -t2 -c400 -d300s -s ${BASH_SOURCE%/*}/fibs.lua $URI_BASE/"
 FIB_4000_PATH=${BASH_SOURCE%/*}/fib_4000.dump
 
-# TODO: consolidate with other scripts
 exit_error()
 {
   echo "Error: $1"

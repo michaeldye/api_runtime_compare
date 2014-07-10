@@ -39,8 +39,9 @@ project(':common') {
 project(':netty') {
 
   dependencies {
-    compile 'io.netty:netty-all:4.0.21.Final'
     compile project(':common')
+    compile 'io.netty:netty-all:4.0.21.Final'
+    runtime 'org.javassist:javassist:3.18.2-GA'
   }
 
 

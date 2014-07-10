@@ -8,7 +8,7 @@ This project is intended to collect API runtime samples for comparison. It's aim
 
 ### Platforms
 
-**heidegger**: 3.15.3-1-ARCH x86_64 GNU/Linux; Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz; 16GB RAM
+**heidegger**: 3.15.3-1-ARCH x86_64 GNU/Linux; Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz; 16GB RAM; java version "1.8.0_05"
 
 ### Runtime Performance Results
 
@@ -16,9 +16,6 @@ This project is intended to collect API runtime samples for comparison. It's aim
 
 As usual, I ran the tests on the same system as the running service for maximum convenience.
 
-        mdye@heidegger: java -version
-        java version "1.8.0_05"
-        ...
         mdye@heidegger:tests[10066]# ./test_count.bash
         Testing http://localhost:9009/api/count for correctness...
         Testing complete, starting benchmark
@@ -42,6 +39,58 @@ As usual, I ran the tests on the same system as the running service for maximum 
           45832291 requests in 5.00m, 21.32GB read
         Requests/sec: 152774.34
         Transfer/sec:     72.77MB
+
+##### scala_spraycan on heidegger, 2014-07-09 (4GB heap)
+
+        mdye@heidegger:tests[10088]# ./test_count.bash
+        Testing http://localhost:9009/api/count for correctness...
+        Testing complete, starting benchmark
+        Running 5m test @ http://localhost:9009/api/count/35
+          3 threads and 500 connections
+          Thread Stats   Avg      Stdev     Max   +/- Stdev
+            Latency    80.57ms  170.44ms 475.10ms   83.25%
+            Req/Sec    33.88k    16.62k   56.09k    80.21%
+          30189344 requests in 5.00m, 6.66GB read
+        Requests/sec: 100631.06
+        Transfer/sec:     22.74MB
+
+        -bash-4.1# /work/tests/test_fib.bash
+        Testing http://localhost:9009/api/fib for correctness...
+        Testing complete, starting benchmark
+        Running 5m test @ http://localhost:9009/api/fib/
+          2 threads and 400 connections
+          Thread Stats   Avg      Stdev     Max   +/- Stdev
+            Latency    29.96ms   61.00ms 263.46ms   92.83%
+            Req/Sec    14.93k     6.05k   26.92k    69.62%
+          8869760 requests in 5.00m, 4.64GB read
+        Requests/sec:  29565.78
+        Transfer/sec:     15.83MB
+
+##### clojure_httpkit on heidegger, 2014-07-10 (4GB heap)
+
+        -bash-4.1# /work/tests/test_count.bash
+        Testing http://localhost:9009/api/count for correctness...
+        Testing complete, starting benchmark
+        Running 5m test @ http://localhost:9009/api/count/35
+          3 threads and 500 connections
+          Thread Stats   Avg      Stdev     Max   +/- Stdev
+            Latency     6.31ms    4.83ms 206.08ms   98.24%
+            Req/Sec    28.43k     5.32k   83.56k    73.22%
+          24172528 requests in 5.00m, 4.84GB read
+        Requests/sec:  80574.80
+        Transfer/sec:     16.52MB
+
+        -bash-4.1# /work/tests/test_fib.bash
+        Testing http://localhost:9009/api/fib for correctness...
+        Testing complete, starting benchmark
+        Running 5m test @ http://localhost:9009/api/fib/
+          2 threads and 400 connections
+          Thread Stats   Avg      Stdev     Max   +/- Stdev
+            Latency     6.71ms    1.76ms  51.79ms   86.84%
+            Req/Sec    30.93k     4.83k   61.00k    76.14%
+          17814419 requests in 5.00m, 8.95GB read
+        Requests/sec:  59381.34
+        Transfer/sec:     30.55MB
 
 ## Cautions
 
@@ -130,7 +179,7 @@ Raise hard and soft file limits. In stock Arch linux, this'll do:
 
 Once inside container, start a runtime:
 
-    /work/netty/start.bash
+    /work/jvm/netty/start.bash
 
 ... and then start a test:
 

@@ -7,7 +7,8 @@
   (:gen-class))
 (timbre/refer-timbre)
 
-(defn fib [a b] (cons a (lazy-seq (fib b (+' b a)))))
+; from Clojure Programming examples, adapted to BigInt with +'
+(def fib-seq (lazy-cat [0 1] (map +' (rest fib-seq) fib-seq)))
 
 (defn response [code body]
   {:status code
@@ -24,7 +25,7 @@
       (let [n (+ 1 ^int (Integer/parseInt ^java.lang.String (nth uri 2)))]
         (case (second uri)
           "count" (response 200 (range 1 n) )
-          "fib" (response 200 (take n (fib 0 1)) )
+          "fib" (response 200 (take n fib-seq) )
           "default" (response 404 "not found")))
 
       (response 404 "not found"))))

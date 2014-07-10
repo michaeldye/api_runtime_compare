@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-(cd ${BASH_SOURCE%/*}; ./gradlew oneJar && java -jar -d64 -server \
+(cd ${BASH_SOURCE%/*}; lein uberjar && java -jar -server \
   -XX:+UseG1GC \
   -Xmn2g -Xms4g -Xmx4g \
   -XX:+AggressiveOpts \
   -XX:-UseAdaptiveSizePolicy \
-  $( ls $(pwd)/build/libs/*standalone.jar ))
+  $( ls $(pwd)/target/*standalone.jar ))
 
 ## Notes:
 ##+ -XX:+UseG1GC

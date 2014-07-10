@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-(cd ${BASH_SOURCE%/*}; gradle oneJar && java -jar -d64 -server \
+(cd ${BASH_SOURCE%/*}; ./gradlew oneJar && java -jar -d64 -server \
   -XX:+UseG1GC \
   -Xmn2g -Xms4g -Xmx4g \
   -XX:+AggressiveOpts \

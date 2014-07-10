@@ -17,9 +17,6 @@ RUN /docker-container_setup/centos/rsyncd_backdoor_setup.bash
 
 RUN echo 'root:devo' | chpasswd
 
-# fetch, install gradle
-RUN cd /usr/local && curl -s -o /tmp/gradle.zip https://services.gradle.org/distributions-snapshots/gradle-2.1-20140708234543+0000-bin.zip && unzip -d `pwd` /tmp/gradle.zip && ln -s $(ls /usr/local/gradle-*/bin/gradle) /usr/local/bin/
-
 # fetch, install leiningen
 RUN curl -s https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -o /usr/local/bin/lein && chmod +x $_ && echo 'export LEIN_ROOT=yes' >> /root/.profile && . /root/.profile && lein
 

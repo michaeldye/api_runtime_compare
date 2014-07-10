@@ -1,1 +1,1 @@
-include 'netty', 'common', 'scala_spraycan', 'jetty9'
+include 'netty', 'common', 'scala_spraycan'

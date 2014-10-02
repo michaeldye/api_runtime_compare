@@ -1,5 +1,5 @@
 FROM aslag/centos6_jdk8_5:vanilla
-MAINTAINER mdye <michael.dye@sungard.com>
+MAINTAINER mike <mike@lulzotron.com>
 
 # see https://bugs.centos.org/view.php?id=7126
 RUN sed -i '/^\[centosplus\]$/,/^\[/ s/^enabled=0$/enabled=1/' /etc/yum.repos.d/CentOS-Base.repo
@@ -9,11 +9,9 @@ RUN rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.
 RUN yum install -y make tar bzip2 git unzip lsof tree
 
 RUN cd / && git clone https://bitbucket.org/mdye/docker-container_setup.git
-RUN /docker-container_setup/centos/ssh_setup.bash
 RUN /docker-container_setup/centos/supervisor_setup.bash
 RUN /docker-container_setup/centos/vim_setup.bash
 RUN /docker-container_setup/centos/wrk_setup.bash
-RUN /docker-container_setup/centos/rsyncd_backdoor_setup.bash
 
 RUN echo 'root:devo' | chpasswd
 

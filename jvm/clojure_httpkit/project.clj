@@ -7,6 +7,6 @@
                  [compojure "1.1.5"]
                  [com.taoensso/timbre "3.1.6"]]
   :plugins [[lein-deps-tree "0.1.2"]]
-  :warn-on-reflection true ; important to improve runtime performance through type hints
+  :global-vars {*warn-on-reflection* true} ; important to improve runtime performance through type hints
   :main run
   :aot [run])

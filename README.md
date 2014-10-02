@@ -92,29 +92,11 @@ As usual, I ran the tests on the same system as the running service for maximum 
         Requests/sec:  59381.34
         Transfer/sec:     30.55MB
 
-### Container setup
+## Project use
 
-Build container:
+This project uses Docker (https://www.docker.com/), an LXC wrapper, to encapsulate runtime state. To use the project, you'll need to install Docker. If you'd like to try the project on-the-quick, consider using Digital Ocean https://www.digitalocean.com/.
 
-    docker build --rm -t mdye/runtime_comp .
-
-### Dev environment
-
-Start the container (note this assumes the current working directory is the project's dir):
-
-    docker run -d --name runtime_comp -p 3328:22 -v `pwd`:/work mdye/runtime_comp
-
-- Enter  shell (`docker-enter` is available at https://github.com/jpetazzo/nsenter)
-
-        sudo docker-enter runtime_comp /bin/bash
-
-... or use nsenter directly (as root):
-
-        nsenter --target $(docker inspect --format {{.State.Pid}} runtime_comp) --mount --uts --ipc --net --pid
-
-### Project use
-
-#### One-time host system setup
+### Host system setup
 
 Raise hard and soft file limits. In stock Arch linux, this'll do:
 
@@ -122,9 +104,29 @@ Raise hard and soft file limits. In stock Arch linux, this'll do:
 
 ... and then reboot. You can check the limits on your box with `ulimit -Hn` and `ulimit -n`.
 
-#### New container setup
+### Container setup
 
-Once inside container, start a runtime:
+Build container:
+
+    docker build --rm -t mdye/runtime_comp .
+
+### Using the container
+
+- Start the container (note this assumes the current working directory is the project's dir):
+
+        docker run -d --name runtime_comp -p 3328:22 -v `pwd`:/work mdye/runtime_comp
+
+- Enter the container's shell (as root):
+
+        nsenter --target $(docker inspect --format {{.State.Pid}} runtime_comp) --mount --uts --ipc --net --pid
+
+- Set up the environment:
+
+        source /etc/profile && source /root/.profile
+
+### Running tests
+
+In the container, start a runtime:
 
     /work/jvm/netty/start.bash
 
@@ -134,7 +136,8 @@ Once inside container, start a runtime:
 
 Note that JVM runtimes perform best after runtime optimization. To get the best results, run a test multiple times against the same runtime before recording them.
 
-### Misc. docker commands
+
+### Misc. docker commands (executed on host)
 
 See all containers (running and not):
 

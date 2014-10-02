@@ -13,10 +13,8 @@ RUN /docker-container_setup/centos/supervisor_setup.bash
 RUN /docker-container_setup/centos/vim_setup.bash
 RUN /docker-container_setup/centos/wrk_setup.bash
 
-RUN echo 'root:devo' | chpasswd
-
 # fetch, install leiningen
-RUN curl -s https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -o /usr/local/bin/lein && chmod +x $_ && echo 'export LEIN_ROOT=yes' >> /root/.profile && . /root/.profile && lein
+RUN curl -s https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein -o /usr/local/bin/lein && chmod +x $_ && echo -e 'export TERM=${TERM:-dumb}\nexport LEIN_ROOT=yes\nexport JAVA_HOME=/usr/java/default\nexport PATH=$JAVA_HOME/bin:/bin:$PATH\n' >> /root/.profile && . /root/.profile && lein
 
 # setup project working dir
 RUN mkdir /work

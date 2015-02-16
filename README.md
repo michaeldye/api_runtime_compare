@@ -114,7 +114,7 @@ Build container:
 
 - Start the container (note this assumes the current working directory is the project's dir):
 
-        docker run -d --name runtime_comp -p 3328:22 -v `pwd`:/work mdye/runtime_comp
+        docker run -d --name runtime_comp -p -v `pwd`:/work mdye/runtime_comp
 
 - Enter the container's shell (as root):
 
